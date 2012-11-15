@@ -1,0 +1,25 @@
+#ifndef GLOBALS_H
+#define GLOBALS_H
+
+#include <QtCore/QString>
+
+const int TypeModRole = Qt::UserRole + 1;
+const QString APP_PATH = "@CMAKE_INSTALL_PREFIX@";
+const QString VERSION_MAJOR = "@MAJOR_VERSION@";
+const QString VERSION_MINOR = "@MINOR_VERSION@";
+const QString VERSION_PATCH = "@PATCH_VERSION@";
+const QString VERSION = "@STUDRATING_VERSION@";
+const QString APP_NAME = "@APPLICATION_NAME@";
+const QString APP_FILE_NAME = "@APPLICATION_FILE_NAME@";
+
+enum typeMod
+{
+	groupMod,
+	groupListMod,
+	disciplinMod,
+	studentMod,
+	studentRatingMod,
+	ratingMod
+};
+
+#endif // GLOBALS_H
