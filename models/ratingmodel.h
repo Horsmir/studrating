@@ -33,6 +33,7 @@ public:
 	
 	void setDb(DataBaseStudRating *db);
 	void setParam(quint32 disciplinId, quint32 groupId, qint32 viewId = -1);
+	void setPrecision(qint32 precision);
 	
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -46,6 +47,7 @@ private:
 	quint32 currentDisciplinId;
 	quint32 currentGroupId;
 	qint32 currentView;
+	qint32 precision;
 };
 
 #endif // RATINGMODEL_H

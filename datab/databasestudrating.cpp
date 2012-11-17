@@ -190,6 +190,17 @@ QVector<qreal> DataBaseStudRating::getCriterionsValues(quint32 disciplinId, quin
 	return res;
 }
 
+qreal DataBaseStudRating::getSumCriteria(quint32 disciplinId, quint32 groupId) const
+{
+	QVector<qreal> vr = getCriterionsValues(disciplinId, groupId);
+	qreal res = 0.0, ret;
+	foreach(ret, vr)
+	{
+		res += ret;
+	}
+	return res;
+}
+
 //====================================================================================================
 
 QDataStream &operator<<(QDataStream &out, const DataBaseStudRating &db)

@@ -54,6 +54,8 @@ private slots:
 	void on_actionOptions_triggered();
 	void on_actionHelp_triggered();
 	void on_actionAbout_triggered();
+	void on_resultDisciplinComboBox_activated();
+	void on_resultGroupComboBox_activated();
 	
 protected:
 	void closeEvent(QCloseEvent *event);

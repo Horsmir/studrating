@@ -19,7 +19,7 @@
 
 #include "ratingmodel.h"
 
-RatingModel::RatingModel(QObject *parent): QAbstractTableModel(parent), currentDisciplinId(0), currentGroupId(0), currentView(-1), dBase(0)
+RatingModel::RatingModel(QObject *parent): QAbstractTableModel(parent), currentDisciplinId(0), currentGroupId(0), currentView(-1), dBase(0), precision(-1)
 {
 
 }
@@ -50,13 +50,19 @@ QVariant RatingModel::data(const QModelIndex &index, int role) const
 			return dBase->getGroup(currentGroupId).getStudent(index.data(Qt::UserRole).toUInt()).getName();
 		else
 		{
-			if(currentView != -1)
+			if(currentView == -2)
 			{
-				retr = dBase->getGroup(currentGroupId).getStudent(index.data(Qt::UserRole).toUInt()).getRating(currentDisciplinId, index.column() - 1).at(currentView);
-				resr = dBase->getCriterion(currentDisciplinId, currentGroupId).at(currentView).getValue();
-				return retr * resr;
+				retVal = 0.0;
+				ret = dBase->getGroup(currentGroupId).getStudent(index.data(Qt::UserRole).toUInt()).getRating(currentDisciplinId, index.column() - 1);
+				res = dBase->getCriterionsValues(currentDisciplinId, currentGroupId);
+				Q_ASSERT(ret.count() == res.count());
+				for(int i = 0; i < ret.count(); i++)
+				{
+					retVal += ret.at(i) * res.at(i);
+				}
+				return QString("%1\%").arg(retVal / dBase->getSumCriteria(currentDisciplinId, currentGroupId) * 100.0, 0, 'f', precision);
 			}
-			else
+			else if(currentView == -1)
 			{
 				retVal = 0.0;
 				ret = dBase->getGroup(currentGroupId).getStudent(index.data(Qt::UserRole).toUInt()).getRating(currentDisciplinId, index.column() - 1);
@@ -67,6 +73,12 @@ QVariant RatingModel::data(const QModelIndex &index, int role) const
 					retVal += ret.at(i) * res.at(i);
 				}
 				return retVal;
+			}
+			else
+			{
+				retr = dBase->getGroup(currentGroupId).getStudent(index.data(Qt::UserRole).toUInt()).getRating(currentDisciplinId, index.column() - 1).at(currentView);
+				resr = dBase->getCriterion(currentDisciplinId, currentGroupId).at(currentView).getValue();
+				return retr * resr;
 			}
 		}
 	}
@@ -115,7 +127,7 @@ QVariant RatingModel::headerData(int section, Qt::Orientation orientation, int r
 Qt::ItemFlags RatingModel::flags(const QModelIndex &index) const
 {
 	Qt::ItemFlags flags = QAbstractItemModel::flags(index);
-	if(currentView == -1 || index.column() == 0)
+	if(currentView < 0 || index.column() == 0)
 		return flags;
 	return (flags | Qt::ItemIsEditable);
 }
@@ -132,6 +144,11 @@ void RatingModel::setParam(quint32 disciplinId, quint32 groupId, qint32 viewId)
 	currentGroupId = groupId;
 	currentView = viewId;
 	reset();
+}
+
+void RatingModel::setPrecision(qint32 precision)
+{
+	this->precision = precision;
 }
 
 #include "ratingmodel.moc"

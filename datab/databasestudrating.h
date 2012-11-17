@@ -48,6 +48,7 @@ public:
 	QStringList getDisciplinList() const;
 	QList<Criterion> getCriterion(quint32 disciplinId, quint32 groupId) const;
 	QVector< qreal > getCriterionsValues(quint32 disciplinId, quint32 groupId) const;
+	qreal getSumCriteria(quint32 disciplinId, quint32 groupId) const;
 
 	quint32 countGroups() const;
 	void editDisciplin(quint32 disciplinId, const QString &newDisciplinName);

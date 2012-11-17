@@ -363,6 +363,7 @@ void studrating::showRating()
 	
 	RatingModel *rm = manager->getRatingModel();
 	rm->setParam(disciplinId, groupId, criterionId);
+	rm->setPrecision(precision);
 	ui->ratingTableView->setModel(rm);
 }
 
@@ -456,6 +457,11 @@ void studrating::showResults()
 	QString totalText = htmlGenerator->htmlHead() + htmlGenerator->htmlHeader().arg(ui->resultDisciplinComboBox->currentText()).arg(ui->resultGroupComboBox->currentText()) + htmlGenerator->tableHead();
 	
 	QStringList students = manager->getStudentNameIdList(groupId);
+	if(students.isEmpty())
+	{
+		ui->resultTextEdit->clear();
+		return;
+	}
 	QString ststr;
 	foreach(ststr, students)
 	{
@@ -465,6 +471,16 @@ void studrating::showResults()
 	
 	ui->resultTextEdit->clear();
 	ui->resultTextEdit->setHtml(totalText);
+}
+
+void studrating::on_resultDisciplinComboBox_activated()
+{
+	showResults();
+}
+
+void studrating::on_resultGroupComboBox_activated()
+{
+	showResults();
 }
 
 #include "studrating.moc"

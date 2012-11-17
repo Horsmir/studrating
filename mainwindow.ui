@@ -653,34 +653,6 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="showResultButton">
-              <property name="text">
-               <string>Показать</string>
-              </property>
-              <property name="icon">
-               <iconset resource="studrating.qrc">
-                <normaloff>:/icons/results.png</normaloff>:/icons/results.png</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
            <widget class="QTextEdit" name="resultTextEdit">
             <property name="readOnly">
              <bool>true</bool>
@@ -699,7 +671,9 @@
              <string>Печать</string>
             </property>
             <property name="icon">
-             <iconset theme="printer"/>
+             <iconset theme="printer">
+              <normaloff/>
+             </iconset>
             </property>
            </widget>
           </item>
