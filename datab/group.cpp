@@ -134,6 +134,18 @@ QStringList Group::getStudentNamesList() const
 	return res;
 }
 
+QStringList Group::getStudentNamesIdList() const
+{
+	QStringList res;
+	Student st;
+	foreach(st, studentList)
+	{
+		res << st.getName() + QString("|%1").arg(st.getStudentId());
+	}
+	res.sort();
+	return res;
+}
+
 void Group::addStudent(const Student &student, QVector<quint32> criteriaNums)
 {
 	quint32 studentId = studentList.count();

@@ -64,7 +64,7 @@ QVector< qreal > Student::getRating(quint32 disciplinId, quint32 dataId) const
 
 qreal Student::getAllRating(quint32 disciplinId, const QVector< qreal >& maxValues) const
 {
-	Q_ASSERT(maxValues.count() == ratingsList.value(disciplinId).count());
+	Q_ASSERT(maxValues.count() == ratingsList.value(disciplinId).at(0).count());
 	QVector<qreal> sr;
 	qreal res = 0.0, f = 0.0;
 	foreach(sr, ratingsList.value(disciplinId))

@@ -7,6 +7,7 @@
 #include "createdbdialog.h"
 #include "studentlistdialog.h"
 #include "adddatedialog.h"
+#include "htmlgenerator.h"
 
 class QStringListModel;
 class QSettings;
@@ -29,6 +30,7 @@ public:
 	void showCriteriaAdvances();
 	void setCriterionList();
 	void showRating();
+	void showResults();
 	
 private slots:
 	void on_contentsWidget_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
@@ -66,6 +68,8 @@ private:
 	QString dbFilePath;
 	QStringListModel *disciplinModel;
 	quint32 currentPageIndex;
+	HtmlGenerator *htmlGenerator;
+	qint32 precision;
 	
 	void createIcon();
 	void writeSettings();

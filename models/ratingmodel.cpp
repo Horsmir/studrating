@@ -47,19 +47,19 @@ QVariant RatingModel::data(const QModelIndex &index, int role) const
 	else if(role == Qt::DisplayRole)
 	{
 		if(index.column() == 0)
-			return dBase->getGroup(currentGroupId).getStudent(index.row()).getName();
+			return dBase->getGroup(currentGroupId).getStudent(index.data(Qt::UserRole).toUInt()).getName();
 		else
 		{
 			if(currentView != -1)
 			{
-				retr = dBase->getGroup(currentGroupId).getStudent(index.row()).getRating(currentDisciplinId, index.column() - 1).at(currentView);
+				retr = dBase->getGroup(currentGroupId).getStudent(index.data(Qt::UserRole).toUInt()).getRating(currentDisciplinId, index.column() - 1).at(currentView);
 				resr = dBase->getCriterion(currentDisciplinId, currentGroupId).at(currentView).getValue();
 				return retr * resr;
 			}
 			else
 			{
 				retVal = 0.0;
-				ret = dBase->getGroup(currentGroupId).getStudent(index.row()).getRating(currentDisciplinId, index.column() - 1);
+				ret = dBase->getGroup(currentGroupId).getStudent(index.data(Qt::UserRole).toUInt()).getRating(currentDisciplinId, index.column() - 1);
 				res = dBase->getCriterionsValues(currentDisciplinId, currentGroupId);
 				Q_ASSERT(ret.count() == res.count());
 				for(int i = 0; i < ret.count(); i++)
@@ -72,7 +72,7 @@ QVariant RatingModel::data(const QModelIndex &index, int role) const
 	}
 	else if(role == Qt::EditRole)
 	{
-		return dBase->getGroup(currentGroupId).getStudent(index.row()).getRating(currentDisciplinId, index.column() - 1).at(currentView);
+		return dBase->getGroup(currentGroupId).getStudent(index.data(Qt::UserRole).toUInt()).getRating(currentDisciplinId, index.column() - 1).at(currentView);
 	}
 	else if(role == Qt::UserRole)
 	{

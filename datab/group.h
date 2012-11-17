@@ -45,6 +45,7 @@ public:
 	qreal getAllRating(quint32 disciplinId, const QVector< qreal > &maxValues) const;
 	qreal getMidleRating(quint32 disciplinId, const QVector< qreal > &maxValues) const;
 	QStringList getStudentNamesList() const;
+	QStringList getStudentNamesIdList() const;
 	quint32 getDateCount(quint32 disciplinId) const;
 	
 	quint32 count() const;

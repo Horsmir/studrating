@@ -33,16 +33,19 @@ message(STATUS "")
 
 find_package(Qt4 REQUIRED)
 
-include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/datab)
+include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/datab ${PROJECT_SOURCE_DIR}/help-browser)
 
 configure_file("${PROJECT_SOURCE_DIR}/globals.h.in" "${PROJECT_BINARY_DIR}/globals.h")
 
-set(datab_SRCS datab/criterion.cpp datab/databasestudrating.cpp datab/group.cpp datab/student.cpp)
+set(helpbrowser_SRCS help-browser/helpbrowser.cpp )
+set(helpbrowser_UIS help-browser/helpform.ui)
+
+set(datab_SRCS datab/htmlgenerator.cpp datab/criterion.cpp datab/databasestudrating.cpp datab/group.cpp datab/student.cpp)
 
 set(models_SRCS models/ratingmodel.cpp models/criteriamodel.cpp models/groupmodel.cpp)
 
-set(studrating_SRCS ${models_SRCS} ${datab_SRCS} adddatedialog.cpp studentlistdialog.cpp createdbdialog.cpp studratingmanager.cpp studrating.cpp main.cpp)
-set(studrating_UIS mainwindow.ui createdbdlg.ui studentlistdlg.ui adddatedlg.ui)
+set(studrating_SRCS ${models_SRCS} ${datab_SRCS} ${helpbrowser_SRCS} adddatedialog.cpp studentlistdialog.cpp createdbdialog.cpp studratingmanager.cpp studrating.cpp main.cpp)
+set(studrating_UIS mainwindow.ui createdbdlg.ui studentlistdlg.ui adddatedlg.ui ${helpbrowser_UIS})
 set(studrating_QRCS studrating.qrc)
 
 qt4_automoc(${studrating_SRCS})
@@ -53,3 +56,4 @@ add_executable(studrating ${studrating_SRCS} ${UI_HEADERS} ${QRC_SOURCES})
 target_link_libraries(studrating ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
 
 install(TARGETS studrating RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(DIRECTORY doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/${APPLICATION_FILE_NAME}/html PATTERN "*~" EXCLUDE)

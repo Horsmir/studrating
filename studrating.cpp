@@ -5,6 +5,7 @@
 #include <QtGui/QStringListModel>
 #include <QtGui/QInputDialog>
 #include <QtGui/QMessageBox>
+#include "helpbrowser.h"
 #include "studrating.h"
 
 
@@ -21,6 +22,8 @@ studrating::studrating(QWidget *parent, Qt::WindowFlags flags): QMainWindow(pare
 	createDbDialog = new CreateDbDialog(this);
 	studentListDialog = new StudentListDialog(this);
 	addDateDialog = new AddDateDialog(this);
+	
+	htmlGenerator = new HtmlGenerator(this);
 	
 	settings = new QSettings( QSettings::NativeFormat, QSettings::UserScope, APP_NAME, QString(), this);
 	readSettings();
@@ -46,7 +49,7 @@ studrating::studrating(QWidget *parent, Qt::WindowFlags flags): QMainWindow(pare
 	{
 		if(manager->groupsIsEmpty() || manager->disciplinsIsEmpty())
 		{
-			for(int i = 3; i <= 4; i++)
+			for(int i = 3; i <= 5; i++)
 			{
 				Qt::ItemFlags flags =  ui->contentsWidget->item(i)->flags();
 				ui->contentsWidget->item(i)->setFlags(flags ^ Qt::ItemIsEnabled);
@@ -104,6 +107,12 @@ void studrating::createIcon()
 	ratingButton->setText(trUtf8("Рейтинг"));
 	ratingButton->setTextAlignment(Qt::AlignHCenter);
 	ratingButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	
+	QListWidgetItem *resultButton = new QListWidgetItem(ui->contentsWidget);
+	resultButton->setIcon(QIcon(":/icons/results.png"));
+	resultButton->setText(trUtf8("Итоги"));
+	resultButton->setTextAlignment(Qt::AlignHCenter);
+	resultButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
 
 void studrating::on_contentsWidget_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
@@ -134,6 +143,11 @@ void studrating::on_contentsWidget_currentItemChanged(QListWidgetItem *current, 
 			setCriterionList();
 			showRating();
 			break;
+		case 5:
+			manager->setDisciplinView(ui->resultDisciplinComboBox);
+			manager->setGroupView(ui->resultGroupComboBox);
+			showResults();
+			break;
 		default:
 			break;
 	}
@@ -156,7 +170,7 @@ void studrating::on_createDbButton_clicked()
 			ui->contentsWidget->item(i)->setFlags(flags | Qt::ItemIsEnabled);
 		}
 		
-		for(int i = 3; i <= 4; i++)
+		for(int i = 3; i <= 5; i++)
 		{
 			Qt::ItemFlags flags =  ui->contentsWidget->item(i)->flags();
 			ui->contentsWidget->item(i)->setFlags(flags ^ Qt::ItemIsEnabled);
@@ -188,7 +202,7 @@ void studrating::on_selectDbFilePathButton_clicked()
 		}
 		if(!manager->groupsIsEmpty() && !manager->disciplinsIsEmpty())
 		{
-			for(int i = 3; i <= 4; i++)
+			for(int i = 3; i <= 5; i++)
 			{
 				Qt::ItemFlags flags =  ui->contentsWidget->item(i)->flags();
 				ui->contentsWidget->item(i)->setFlags(flags | Qt::ItemIsEnabled);
@@ -196,7 +210,7 @@ void studrating::on_selectDbFilePathButton_clicked()
 		}
 		else
 		{
-			for(int i = 3; i <= 4; i++)
+			for(int i = 3; i <= 5; i++)
 			{
 				Qt::ItemFlags flags =  ui->contentsWidget->item(i)->flags();
 				ui->contentsWidget->item(i)->setFlags(flags ^ Qt::ItemIsEnabled);
@@ -230,7 +244,7 @@ void studrating::on_addDisciplinButton_clicked()
 		showDisciplinList();
 		if(!manager->groupsIsEmpty())
 		{
-			for(int i = 3; i <= 4; i++)
+			for(int i = 3; i <= 5; i++)
 			{
 				Qt::ItemFlags flags =  ui->contentsWidget->item(i)->flags();
 				ui->contentsWidget->item(i)->setFlags(flags | Qt::ItemIsEnabled);
@@ -255,6 +269,7 @@ void studrating::on_editDisciplinButton_clicked()
 void studrating::readSettings()
 {
 	dbFilePath = settings->value("general/CurrentDBFilePath", QString()).toString();
+	precision = settings->value("general/Precision", 2).toInt();
 	currentPageIndex = settings->value("view/LastPage", 0).toInt();
 	restoreGeometry(settings->value("view/Geometry", saveGeometry()).toByteArray());
 }
@@ -264,6 +279,7 @@ void studrating::writeSettings()
 	settings->setValue("general/ApplicationName", APP_NAME);
 	settings->setValue("general/ApplicationVersion", VERSION);
 	settings->setValue("general/CurrentDBFilePath", dbFilePath);
+	settings->setValue("general/Precision", precision);
 	settings->setValue("view/LastPage", ui->pagesWidget->currentIndex());
 	settings->setValue("view/Geometry", saveGeometry());
 }
@@ -285,7 +301,7 @@ void studrating::on_addGroupButton_clicked()
 		showGroupslinList();
 		if(!manager->disciplinsIsEmpty())
 		{
-			for(int i = 3; i <= 4; i++)
+			for(int i = 3; i <= 5; i++)
 			{
 				Qt::ItemFlags flags =  ui->contentsWidget->item(i)->flags();
 				ui->contentsWidget->item(i)->setFlags(flags | Qt::ItemIsEnabled);
@@ -386,7 +402,14 @@ void studrating::on_addRatingButton_clicked()
 
 void studrating::on_actionAbout_triggered()
 {
-	//TODO
+	QString str1, str2, str3, str4;
+	
+	str1 = trUtf8("<h2>%1 %2</h2><p><b>%1</b> - предназначена для учёта рейтинга студентов по различным дисциплинам, а также вычисления и вывода итоговых результатов.</p><p>Copyright &copy;  2012 Роман Браун</p><p>Icons: Copyright &copy; <a href=\"http://kde-look.org/usermanager/search.php?username=frag\">frag F-L</a>").arg(APP_NAME).arg(VERSION);
+	str2 = trUtf8("<p>Это программа является свободным программным обеспечением. Вы можете распространять и/или модифицировать её согласно условиям Стандартной Общественной Лицензии GNU, опубликованной Фондом Свободного Программного Обеспечения, версии 3 или, по Вашему желанию, любой более поздней версии.</p>");
+	str3 = trUtf8("<p>Эта программа распространяется в надежде, что она будет полезной, но БЕЗ ВСЯКИХ ГАРАНТИЙ, в том числе подразумеваемых гарантий ТОВАРНОГО СОСТОЯНИЯ ПРИ ПРОДАЖЕ и ГОДНОСТИ ДЛЯ ОПРЕДЕЛЁННОГО ПРИМЕНЕНИЯ. Смотрите Стандартную Общественную Лицензию GNU для получения дополнительной информации.</p>");
+	str4 = trUtf8("<p>Вы должны были получить копию Стандартной Общественной Лицензии GNU вместе с программой. В случае её отсутствия, посмотрите <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.</p><p>E-Mail: <a href=\"mailto:firdragon76@gmail.com\">firdragon76@gmail.com</a><br>Сайт программы: <a href=\"github.com/Horsmir/%1\">github.com/Horsmir/%1</a></p>").arg(APP_FILE_NAME);
+	
+	QMessageBox::about(this, trUtf8("О программе"), str1 + str2 + str3 + str4);
 }
 
 void studrating::on_actionExit_triggered()
@@ -396,7 +419,14 @@ void studrating::on_actionExit_triggered()
 
 void studrating::on_actionHelp_triggered()
 {
-	//TODO
+	QString docDir;
+#ifdef Q_OS_LINUX
+	docDir = APP_PATH + "/share/doc/" + APP_FILE_NAME + "/html";
+#endif
+#ifdef Q_OS_WIN
+	docDir = "doc/html";
+#endif
+	HelpBrowser::showPage(docDir, "index.html");
 }
 
 void studrating::on_actionNew_triggered()
@@ -417,6 +447,24 @@ void studrating::on_actionOptions_triggered()
 void studrating::on_actionSave_triggered()
 {
 	manager->saveDb();
+}
+
+void studrating::showResults()
+{
+	quint32 disciplinId = ui->resultDisciplinComboBox->itemData(ui->resultDisciplinComboBox->currentIndex()).toUInt();
+	quint32 groupId = ui->resultGroupComboBox->itemData(ui->resultGroupComboBox->currentIndex()).toUInt();
+	QString totalText = htmlGenerator->htmlHead() + htmlGenerator->htmlHeader().arg(ui->resultDisciplinComboBox->currentText()).arg(ui->resultGroupComboBox->currentText()) + htmlGenerator->tableHead();
+	
+	QStringList students = manager->getStudentNameIdList(groupId);
+	QString ststr;
+	foreach(ststr, students)
+	{
+		totalText += htmlGenerator->tableRow().arg(ststr.split("|").at(0)).arg(manager->getAllRatingStudent(disciplinId, groupId, ststr.split("|").at(1).toUInt()), 0, 'f', precision);
+	}
+	totalText += htmlGenerator->htmlEnd().arg(manager->getMidleRating(disciplinId, groupId), 0, 'f', precision).arg(manager->getAllRating(disciplinId, groupId), 0, 'f', precision);
+	
+	ui->resultTextEdit->clear();
+	ui->resultTextEdit->setHtml(totalText);
 }
 
 #include "studrating.moc"
