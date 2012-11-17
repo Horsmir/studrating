@@ -24,7 +24,7 @@ message(STATUS "CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
 
 set(MAJOR_VERSION 0)
 set(MINOR_VERSION 1)
-set(PATCH_VERSION 1)
+set(PATCH_VERSION 2)
 set(STUDRATING_VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION})
 add_definitions(-DSTUDRATING_VERSION=\"${STUDRATING_VERSION}\")
 message(STATUS "")
@@ -57,3 +57,14 @@ target_link_libraries(studrating ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
 
 install(TARGETS studrating RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(DIRECTORY doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/${APPLICATION_FILE_NAME}/html PATTERN "*~" EXCLUDE)
+install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/${APPLICATION_FILE_NAME})
+
+########## Add make dist target ################
+set(CPACK_PACKAGE_VERSION "${STUDRATING_VERSION}")
+set(CPACK_SOURCE_GENERATOR "TBZ2")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${APPLICATION_FILE_NAME}-${STUDRATING_VERSION}")
+set(CPACK_IGNORE_FILES "/CVS/;/\\\\.git\;/\\\\.svn/;\\\\.swp$;\\\\.#;/#;\\\\.tar.gz$;/CMakeFiles/;CMakeCache.txt;build/;dist/;exp/;data/;.*~")
+set(CPACK_SOURCE_IGNORE_FILES ${CPACK_IGNORE_FILES})
+include(CPack)
+# simulate autotools' "make dist"
+add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
